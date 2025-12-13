@@ -1,0 +1,24 @@
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+          unordered_map<int,int>mp;
+
+          int max_el = INT_MIN;
+          int min_el = INT_MAX;
+
+          for(int& num : nums){
+              mp[num]++;
+              min_el = min(min_el,num);
+              max_el = max(max_el,num);
+          }
+          int i = 0;
+          for(int num = min_el;num<=max_el;num++){
+              while(mp[num] > 0){
+                 nums[i] = num;
+                 i++;
+                 mp[num]--;
+              }
+          }
+    return nums;    
+    }
+};
