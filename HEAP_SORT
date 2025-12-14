@@ -1,0 +1,118 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class BinaryHeap {
+private:
+    vector<int> heap;
+    bool isMinHeap;
+
+    bool compare(int a, int b) {
+        return isMinHeap ? a < b : a > b;
+    }
+
+    void heapifyUp(int index) {
+        int parent = (index - 1) / 2;//start from non leap
+        while (index > 0 && compare(heap[index], heap[parent])) {
+            swap(heap[index], heap[parent]);
+            index = parent;
+            parent = (index - 1) / 2;
+        }
+    }
+
+
+    void heapifyDown(int index) {
+        int size = heap.size();
+        while (true) {
+            int left = 2 * index + 1;
+            int right = 2 * index + 2;
+            int swapIndex = index;
+
+            if (left < size && compare(heap[left], heap[swapIndex]))
+                swapIndex = left;
+
+            if (right < size && compare(heap[right], heap[swapIndex]))
+                swapIndex = right;
+
+            if (swapIndex == index)
+                break;
+
+            swap(heap[index], heap[swapIndex]);
+            index = swapIndex;
+        }
+    }
+
+public:
+    BinaryHeap(bool isMin = true) {
+        isMinHeap = isMin;
+    }
+
+
+    int extract() {
+        if (heap.empty()) return -1;
+        int root = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        heapifyDown(0);
+        return root;
+    }
+    void deleteAt(int index) {
+    int size = heap.size();
+    if (index < 0 || index >= size) {
+        cout << "Index out of range\n";
+        return;
+    }
+
+    // Swap with last element
+    swap(heap[index], heap[size - 1]);
+
+    // Remove the last element
+    heap.pop_back();
+    size--;
+
+    // Restore heap property
+    if (index < size) {
+        heapifyDown(index);
+        heapifyUp(index);  // needed in case value is now smaller/larger
+    }
+}
+
+    void buildHeap(const vector<int>& array) {
+        heap = array;
+        for (int i = heap.size() / 2 - 1; i >= 0; i--) // start from non leap do heapify from its
+                                                     // children000
+            heapifyDown(i);
+    }
+
+    bool isEmpty() {
+        return heap.empty();
+    }
+};
+vector<int> heapSort(vector<int> array, bool ascending = true) {
+    // For ascending sort: use max-heap
+    // For descending sort: use min-heap
+    BinaryHeap heap(!ascending); // notice: !ascending
+    heap.buildHeap(array);
+    heap.deleteAt(6);
+
+    vector<int> sorted;
+    while (!heap.isEmpty()) {
+        sorted.push_back(heap.extract());
+    }
+    return sorted;
+}
+int main() {
+    vector<int> arr = {9, 4, 7, 1, -2, 6, 5};
+
+    vector<int> asc = heapSort(arr, false);
+    cout << "Heap Sort Ascending: ";
+    for (int val : asc) cout << val << " ";
+    cout << endl;
+
+    vector<int> desc = heapSort(arr, true);
+    cout << "Heap Sort Descending: ";
+    for (int val : desc) cout << val << " ";
+    cout << endl;
+
+    return 0;
+}
